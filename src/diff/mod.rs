@@ -8,16 +8,28 @@ pub struct DiffPayload {
     content: String
 }
 
-pub async fn http_handler(payload: String) -> impl Responder {
-    // process diff with gpt
+pub async fn process(payload: String) -> Result<String, Box<dyn std::error::Error>> {
     let chatgpt = ChatGPT::new(
         env::var_os("GPT_API").unwrap().into_string().unwrap(),
         env::var_os("GPT_TOKEN").unwrap().into_string().unwrap(),
         env::var_os("GPT_DIFF_PROMPT").unwrap().into_string().unwrap()
     );
 
-    let response = chatgpt.generate_response(payload).await;
+    let response = chatgpt.generate_response(payload).await?;
 
-    // Return a success response
-    response.unwrap().to_string()
+    Ok(response.to_string())
 }
+
+pub async fn http_handler(payload: String) -> impl Responder {
+    match process(payload).await {
+        Ok(response) => {
+            // Return a success response
+            response
+        }
+        Err(err) => {
+            // Return an error response
+            err.to_string()
+        }
+    }
+}
+

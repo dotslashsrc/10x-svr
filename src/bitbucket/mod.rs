@@ -29,6 +29,10 @@ pub async fn webhook(payload: String) -> impl Responder {
     // For example, you could add a comment to the pull request, or trigger a build
     println!("Received Pull Request: {:?}", pr);
 
+    // TODO: fetch diff from bitbucket api
+    // TODO: call diff::process
+    // TODO: return diff::process result
+
     // Return a success response
     "Webhook received".to_string()
 }
